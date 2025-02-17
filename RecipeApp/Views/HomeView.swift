@@ -8,14 +8,17 @@
 import SwiftUI
 
 struct HomeView: View {
-    @State var vm: HomeViewModel = HomeViewModel()
+    @StateObject var vm: HomeViewModel = HomeViewModel()
     
     var body: some View {
         List(vm.recipes) { recipe in
             RecipeCardView(recipe: recipe)
         } //: List
         .padding()
-        .environment(vm)
+        .task {
+            await vm.loadRecipes()
+        }
+        .environmentObject(vm)
     } //: Body
 }
 
