@@ -11,28 +11,50 @@
  [x] Fetch recipes on appear
  [x] Move image conversion logic into the view model.
  [x] Create NetworkService to fetch JSON
- - I think this can just be a final class, probably not a MainActor
-     - Might need to account for malformed or empty data.
-         - This has to be done somewhere, but should it be the same class fetching data?
  [x] Create custom error enum to handle different cases
  [x] Use .refreshable for refresh
- TODO: Create CacheService - ifExists, get, add. I don't think this needs a delete
- TODO: Handle operating system versions back to iOS 16
- TODO: Display state of loading
- TODO: Error occuring while fetching small images
+ [x] each recipe should show its name, photo, and cuisine type
  
  
- 
- 
- Image data vs. NetworkService
- 
- If network service is intended to handle all network activity, there are parts of the image conversion process that belong in it. 
-    - Getting data from the URL
 
- This would leave the original idea of an image service doing barely anything.
  
- The remaining image conversion functions should probably just go in the view model since it's already a MainActor
+ Views
+ TODO: Display state of loading
+ TODO: If the recipes list is empty, the app should display an empty state to inform users that no recipes are available.
+ - This can probably be done in the View itself
+ TODO: Make sure refresh is working with the cache 
+ TODO: Load images only when needed in the UI to avoid unnecessary bandwidth consumption. Cache images to disk to minimize repeated network requests
+     - Only mentions images, no need to cache JSON responses.
+     - Load images as needed in the UI via NSCache because these are session based and will help UI performance; Cache images to disk so once the app closes/re opens the image can be fetched without relying on a network request
  
+ 1. View appears, fetch called.
+ 2. JSON downloaded, encoded, and stored in [Recipe]
+ 3. Recipe list appears, URL should be passed to a RecipeImageView which calls fetchImage.
+ 4. Fetch Image; For this case I'm going to pull from the NS Cache first since this is more closely tied to the UI.
+     1. Pass URL to NSCache service, get image if exists, if not then continue;
+     2. Pass URL to FileManagerCache/Disk service, get image if exists, if not then download through NetworkService and cache in both NSCache and FileManager
+ 
+ 
+ Cache
+ TODO: Create CacheManaging protocol - exists, get, add
+ TODO: Create DiskCacheService (FileManager)
+ TODO: Create SessionCacheService (NSCache)
+ 
+ 
+ Errors/Cases
+ TODO: If a recipe is malformed, your app should disregard the entire list of recipes and handle the error gracefully.
+ TODO: Error occuring while fetching small images
+
+
+ Tests
+ TODO: Test JSON decoding
+ TODO: Test CacheManaging protocol functions
+ TODO: Test proper AppError casting
+ 
+ Before production
+ TODO: Handle operating system versions back to iOS 16
+ TODO: Make sure all image loading is using async/await
+
  */
 
 

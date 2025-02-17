@@ -17,31 +17,23 @@ import SwiftUI
 @MainActor
 class HomeViewModel: ObservableObject {
     private let networkService: NetworkService
+    private let sessionCacheService: SessionCacheService
+    
     @Published var recipes: [Recipe] = []
     
-    let cache: NSCache<NSString, UIImage>
+    
+    @Published var isLoading: Bool = false
     
     init() {
         self.networkService = NetworkService.shared
-        // TODO: Move cache to its own Service
-        let cache = NSCache<NSString, UIImage>()
-        cache.countLimit = 15
-        // TODO: Set totalCostLimit
-        self.cache = cache
+        self.sessionCacheService = SessionCacheService.shared
     }
     
-    func addImageToCache(_ image: UIImage, forKey key: NSString) {
-        guard cache.object(forKey: key) == nil else {
-            print("Image already exists for: \(key)")
-            return 
-        }
-        cache.setObject(image, forKey: key)
-        print("Image added to cache")
-    }
-
-    func loadRecipes() async {
-        // Check cache for images
     
+    func loadRecipes() async {   
+        self.isLoading = true
+        defer { isLoading = false }
+        
         do {
             let recipes = try await networkService.fetchRecipes()
             self.recipes = recipes
@@ -52,17 +44,12 @@ class HomeViewModel: ObservableObject {
             print("Unknown error occured while loading recipes")
             return 
         }
-        for recipe in recipes {
-            guard let urlString = recipe.photoUrlLarge else { return }
-            
-            await cacheImage(for: urlString)
-        }
+        
+//        for recipe in recipes {
+//            guard let urlString = recipe.photoUrlLarge else { return }
+//            await cacheImage(for: urlString)
+//        }
                
-    }
-    
-    func cacheImage(for urlString: String) async {
-        guard let uiImage = await getImage(at: urlString) else { return }
-        addImageToCache(uiImage, forKey: NSString(string: urlString))
     }
     
     var imageSizes: Int = 0
@@ -76,12 +63,13 @@ class HomeViewModel: ObservableObject {
     // This should be given a String and only return an optional if there is an issue getting data from the URL
     // The view calling this already knows if its Recipe has nil URLs
     // The view can send a string for either the small or large image. This should only be responsible for converting it.
-    @MainActor func getImage(at urlString: String) async -> UIImage? {
+    @MainActor func downloadImage(at urlString: String) async -> UIImage? {
         do {
             let url = try getUrl(from: urlString)
             let imageData = try await networkService.getData(from: url)
             let uiImage = try getImage(from: imageData)
 //            printSize(of: imageData)
+            await sessionCacheService.set(uiImage, forKey: urlString)
             return uiImage
         } catch {
             print("Error getting image: \(error)")
@@ -94,6 +82,7 @@ class HomeViewModel: ObservableObject {
         return url
     }
     
+    /// Returns a UIImage from the given Data
     private func getImage(from data: Data) throws -> UIImage {
         guard let image = UIImage(data: data) else { throw AppError.invalidImageData }
         return image

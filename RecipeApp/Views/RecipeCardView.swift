@@ -36,9 +36,8 @@ struct RecipeCardView: View {
         } //: VStack
         .task {
             // Ensure the recipe has a non-nil url before sending it to view model
-            
             guard let urlString = recipe.photoUrlSmall else { return }
-            self.image = await vm.getImage(at: urlString)
+            self.image = await vm.downloadImage(at: urlString)
         }
     }
 }

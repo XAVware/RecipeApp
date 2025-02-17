@@ -17,6 +17,8 @@ actor NetworkService {
     
     private init() { }
     
+    //  TODO: If a recipe is malformed, your app should disregard the entire list of recipes and handle the error gracefully.
+    // This, or something, should return the whole Response, not just the recipes. This will help determine cases of good data, malformed or empty.
     func fetchRecipes() async throws -> [Recipe] {
         guard let url = URL(string: self.recipeEndpointString) else { throw AppError.invalidUrlString }
         do {
