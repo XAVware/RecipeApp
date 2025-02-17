@@ -7,6 +7,22 @@
 
 import SwiftUI
 
+/// Handles all network activity for the app
+actor NetworkService {
+    static let shared: NetworkService = NetworkService()
+    
+    private init() { }
+    
+    
+    // Fetch recipes
+    
+    /// Fetch data from a URL
+    func getData(from url: URL) async throws -> Data {
+        let data = try await URLSession.shared.data(from: url)
+        return data.0
+    }
+}
+
 @Observable
 class HomeViewModel {
     
@@ -25,10 +41,11 @@ class HomeViewModel {
         ]
     }
     """
-
+    let networkService: NetworkService
     var recipes: [Recipe] = []
     
     init() {
+        self.networkService = NetworkService.shared
         getRecipes()
     }
     
@@ -48,4 +65,37 @@ class HomeViewModel {
             print("Error decoding JSON: \(error)")
         }
     }
+    
+
+    
+    // This should be given a String and only return an optional if there is an issue getting data from the URL
+    // The view calling this already knows if its Recipe has nil URLs
+    // The view can send a string for either the small or large image. This should only be responsible for converting it.
+    @MainActor func getImage(at urlString: String) async -> UIImage? {
+        do {
+            let url = try getUrl(from: urlString)
+            let imageData = try await networkService.getData(from: url)
+            return try getImage(from: imageData)
+        } catch {
+            print("Error getting image: \(error)")
+            return nil
+        }
+    }
+    
+    private func getUrl(from urlString: String) throws -> URL {
+        guard let url = URL(string: urlString) else {
+            print("Could not convert URL from string")
+            throw URLError(.badURL)
+        }
+        return url
+    }
+    
+    private func getImage(from data: Data) throws -> UIImage {
+        guard let image = UIImage(data: data) else {
+            print("Error getting image")
+            throw URLError(.badURL)
+        }
+        return image
+    }
+    
 }

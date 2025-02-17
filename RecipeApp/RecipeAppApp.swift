@@ -9,15 +9,26 @@
 /*
  [x] Convert URL string to UIImage
  TODO: Fetch recipes on appear
- TODO: Create ImageDataService to handle URL/data to UIImage conversion
-    - Should be MainActor
+ [x] Move image conversion logic into the view model.
+ 
  TODO: Create NetworkService to fetch JSON
  - I think this can just be a final class, probably not a MainActor
- - Might need to account for malformed or empty data.
- - This has to be done somewhere, but should it be the same class fetching data?
+     - Might need to account for malformed or empty data.
+         - This has to be done somewhere, but should it be the same class fetching data?
  TODO: Create CacheService - ifExists, get, add. I don't think this needs a delete
  TODO: Use .refreshable for refresh
  TODO: Create custom error enum to handle different cases
+ TODO: Handle operating system versions back to iOS 16
+    - @Observable became available iOS 17
+ 
+ Image data vs. NetworkService
+ 
+ If network service is intended to handle all network activity, there are parts of the image conversion process that belong in it. 
+    - Getting data from the URL
+
+ This would leave the original idea of an image service doing barely anything.
+ 
+ The remaining image conversion functions should probably just go in the view model since it's already a MainActor
  
  */
 

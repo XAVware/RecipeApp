@@ -5,8 +5,6 @@
 //  Created by Ryan Smetana on 2/16/25.
 //
 
-
-
 import SwiftUI
 
 struct HomeView: View {
@@ -17,6 +15,7 @@ struct HomeView: View {
             RecipeCardView(recipe: recipe)
         } //: List
         .padding()
+        .environment(vm)
     } //: Body
 }
 
