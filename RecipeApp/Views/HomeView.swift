@@ -15,9 +15,14 @@ struct HomeView: View {
             RecipeCardView(recipe: recipe)
         } //: List
         .padding()
+        .refreshable(action: vm.loadRecipes)
         .task {
             await vm.loadRecipes()
         }
+        .overlay(
+            Label("Pull down to refresh", systemImage: "arrow.counterclockwise")
+                .font(.caption2)
+            , alignment: .top)
         .environmentObject(vm)
     } //: Body
 }

@@ -15,8 +15,8 @@
      - Might need to account for malformed or empty data.
          - This has to be done somewhere, but should it be the same class fetching data?
  [x] Create custom error enum to handle different cases
+ [x] Use .refreshable for refresh
  TODO: Create CacheService - ifExists, get, add. I don't think this needs a delete
- TODO: Use .refreshable for refresh
  TODO: Handle operating system versions back to iOS 16
  TODO: Display state of loading
  

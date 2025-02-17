@@ -19,6 +19,9 @@ class HomeViewModel: ObservableObject {
     }
 
     func loadRecipes() async {
+        // Check cache for images
+        
+        // If cache does not contain images
         do {
             let recipes = try await networkService.fetchRecipes()
             self.recipes = recipes
