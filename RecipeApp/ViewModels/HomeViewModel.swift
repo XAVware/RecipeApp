@@ -7,11 +7,6 @@
 
 import SwiftUI
 
-/*
- 
- Convert URL to image
- */
-
 @Observable
 class HomeViewModel {
     
@@ -21,7 +16,7 @@ class HomeViewModel {
             {
                 "cuisine": "Malaysian",
                 "name": "Apam Balik",
-                "photo_url_large": "https://d3jbb8n5wk0qxi.cloudfront.net/photos/b9ab0071-b281-4bee-b361-ec340d405320/large.jpg",
+                "photo_url_large": "https://d3jbb8n5wk0qxi.cloudfront.net/photos/7276e9f9-02a2-47a0-8d70-d91bdb149e9e/large.jpg",
                 "photo_url_small": "https://d3jbb8n5wk0qxi.cloudfront.net/photos/b9ab0071-b281-4bee-b361-ec340d405320/small.jpg",
                 "source_url": "https://www.nyonyacooking.com/recipes/apam-balik~SJ5WuvsDf9WQ",
                 "uuid": "0c6ca6e7-e32a-4053-b824-1dbf749910d8",
@@ -37,7 +32,7 @@ class HomeViewModel {
         getRecipes()
     }
     
-    func getRecipes() /*-> [Recipe]*/ {
+    func getRecipes() {
         let jsonDecoder = JSONDecoder()
         
         guard let jsonData = text.data(using: .utf8) else {
@@ -53,6 +48,4 @@ class HomeViewModel {
             print("Error decoding JSON: \(error)")
         }
     }
-    
-    
 }
