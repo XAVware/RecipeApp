@@ -19,6 +19,7 @@
  TODO: Create CacheService - ifExists, get, add. I don't think this needs a delete
  TODO: Handle operating system versions back to iOS 16
  TODO: Display state of loading
+ TODO: Error occuring while fetching small images
  
  
  
