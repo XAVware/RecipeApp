@@ -30,11 +30,11 @@ final class SessionCacheService {
         // Set totalCostLimit
     }
     
-    func set(_ image: UIImage, forKey key: NSString) async {
+    private func set(_ image: UIImage, forKey key: NSString) async {
         cache.setObject(image, forKey: key)
     }
     
-    func getObj(forKey key: NSString) async -> UIImage? {
+    private func getObj(forKey key: NSString) async -> UIImage? {
         cache.object(forKey: key)
     }
     
@@ -42,7 +42,7 @@ final class SessionCacheService {
         return cache.object(forKey: key) != nil
     }
     
-    // Helper functions offering the option to pass a String instead of NSString
+    // NSString typically won't be used in SwiftUI. Force using String and keep NSString internal
     func set(_ image: UIImage, forKey key: String) async {
         let nStr = NSString(string: key)
         await self.set(image, forKey: nStr)
@@ -53,6 +53,7 @@ final class SessionCacheService {
         return await self.getObj(forKey: nStr)
     }
 }
+
 
 @MainActor
 final class DiskCacheService {
@@ -78,19 +79,30 @@ final class DiskCacheService {
         }
     }
     
+    func clearCache() {
+        do {
+            let cachedImagePaths = try fileManager.contentsOfDirectory(atPath: imageCacheDirectory.path)
+            cachedImagePaths.forEach({ deleteFile(atPath: $0) })
+        } catch {
+            print("Error clearing disk cache: \(error)")
+            return
+        }
+    }
+    
+    private func deleteFile(atPath path: String) {
+        try? fileManager.removeItem(atPath: path)
+    }
+    
 //    func getObj(forKey key: NSString) async -> UIImage? {
 //        guard fileManager.fileExists(atPath: key) else {
 //            return nil
 //        }
 //    }
 //    
-//    func set(_ image: UIImage, forKey key: NSString) async {
-//        if !fileManager.fileExists(atPath: filePath) {
-//            let contents = Data()
-//            fileManager.createFile(atPath: filePath, contents: contents)
-//            
-//        } else {
-//            print("File \(filePath) already exists")
-//        }
-//    }
+    func add(_ image: UIImage, forKey key: String) async {
+        let imagePath = imageCacheDirectory.appendingPathComponent(key)
+        
+        fileManager.createFile(atPath: imagePath.path, contents: image.jpegData(compressionQuality: 0))
+        print("Image cached to disk")
+    }
 }

@@ -9,7 +9,13 @@ import XCTest
 @testable import RecipeApp
 
 final class DiskCacheServiceTests: XCTestCase {
-
+    var testCacheService: DiskCacheService!
+    private let fileManager = FileManager.default
+    lazy var imageCacheDir: URL = {
+        let cacheDirectory = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first!
+        return cacheDirectory.appendingPathComponent("RecipeImages")
+    }()
+    
 //    override func setUpWithError() throws {
 //        // Put setup code here. This method is called before the invocation of each test method in the class.
 //    }
@@ -19,28 +25,43 @@ final class DiskCacheServiceTests: XCTestCase {
 //    }
     
     override func setUp() {
+        super.setUp()
+        testCacheService = DiskCacheService.shared
+        Task { await testCacheService.clearCache() }
         
     }
     
     override func tearDown() {
-        
+        super.tearDown()
+        Task { await testCacheService.clearCache() }
     }
 
-    func testCreateDirectory() {
-        let fileManager = FileManager.default
-        let cacheDirectory = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first!
-        let imageCacheDirectory = cacheDirectory.appendingPathComponent("RecipeImages")
-        
-        try? fileManager.removeItem(at: imageCacheDirectory)
-        
+    func testCreatingDirectory() {
+        try? fileManager.removeItem(at: imageCacheDir)
+
         // Shouldn't exist after being removed
-        let dne = !fileManager.fileExists(atPath: imageCacheDirectory.path)
+        let dne = !fileManager.fileExists(atPath: imageCacheDir.path)
         XCTAssertTrue(dne)
         
-        // Create and confirm exists
-        try? fileManager.createDirectory(at: imageCacheDirectory, withIntermediateDirectories: true)
-        let exists = fileManager.fileExists(atPath: imageCacheDirectory.path)
-        XCTAssertTrue(exists)
+        Task {
+            await testCacheService.setupDirectory()
+            let exists = fileManager.fileExists(atPath: imageCacheDir.path)
+            XCTAssertTrue(exists)
+        }
+    }
+    
+    // TODO: I should make sure the content of the file matches the image after creating it
+    func testCreatingFile() {
+        let key = "dog"
+        let img = UIImage(systemName: key)
+        let imagePath = imageCacheDir.appendingPathComponent(key)
+        
+        
+        Task {
+            await testCacheService.add(img!, forKey: key)
+            let exists = fileManager.fileExists(atPath: imagePath.path)
+            XCTAssertTrue(exists)
+        }
     }
 
 
