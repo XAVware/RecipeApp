@@ -63,6 +63,21 @@ final class DiskCacheServiceTests: XCTestCase {
             XCTAssertTrue(exists)
         }
     }
+    
+    func testCacheImage() {
+        let key = "dog"
+        let img = UIImage(systemName: key)!
+        let imagePath = imageCacheDir.appendingPathComponent(key)
+        
+//        let dne = !fileManager.fileExists(atPath: imagePath.path)
+//        XCTAssertTrue(dne)
+        
+        Task {
+            await testCacheService.add(img, forKey: key)
+            let exists = fileManager.fileExists(atPath: imagePath.path)
+            XCTAssertTrue(exists)
+        }
+    }
 
 
 }

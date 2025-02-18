@@ -93,12 +93,16 @@ final class DiskCacheService {
         try? fileManager.removeItem(atPath: path)
     }
     
-//    func getObj(forKey key: NSString) async -> UIImage? {
-//        guard fileManager.fileExists(atPath: key) else {
-//            return nil
-//        }
-//    }
-//    
+    func getObj(forKey key: String) async -> UIImage? {
+        let filePath = imageCacheDirectory.appendingPathComponent(key)
+        if let data = fileManager.contents(atPath: filePath.path) {
+            // This is going to return an optional image even if the image exists... okay?
+            let image = UIImage(data: data)
+            return image
+        }
+        return nil
+    }
+    
     func add(_ image: UIImage, forKey key: String) async {
         let imagePath = imageCacheDirectory.appendingPathComponent(key)
         
