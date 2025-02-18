@@ -29,8 +29,8 @@ class HomeViewModel: ObservableObject {
         self.sessionCacheService = SessionCacheService.shared
     }
     
-    
-    func loadRecipes() async {   
+    /// Initialize recipe array when app starts
+    func initializeRecipes() async {   
         self.isLoading = true
         defer { isLoading = false }
         
@@ -38,6 +38,7 @@ class HomeViewModel: ObservableObject {
             let recipes = try await networkService.fetchRecipes()
             self.recipes = recipes
         } catch let error as AppError {
+            // TODO: Handle malformed recipes.
             print(error.localizedDescription)
             return
         } catch {
@@ -69,7 +70,7 @@ class HomeViewModel: ObservableObject {
             let imageData = try await networkService.getData(from: url)
             let uiImage = try getImage(from: imageData)
 //            printSize(of: imageData)
-            await sessionCacheService.set(uiImage, forKey: urlString)
+//            await sessionCacheService.set(uiImage, forKey: urlString)
             return uiImage
         } catch {
             print("Error getting image: \(error)")

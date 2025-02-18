@@ -57,19 +57,25 @@ final class SessionCacheService {
 @MainActor
 final class DiskCacheService {
     static let shared: DiskCacheService = DiskCacheService()
-    let fileManager = FileManager.default
-//    let imageCacheDirectory: URL
+    
+    private let fileManager = FileManager.default
+    lazy var imageCacheDirectory: URL = {
+        let cacheDirectory = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first!
+        return cacheDirectory.appendingPathComponent("RecipeImages")
+    }()
     
     private init() {
-        let cacheDirectory = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first!
-        
-        // Create a directory for images in case we want to use the caches directory for something else, like favorites, later.
-        let imageCacheDirectory = cacheDirectory.appendingPathComponent("RecipeImages")
-        
-        // I think I have to  check if the directory exists or create it before going any further.
-        
-        // Going to take a lunch break and run an errand - I will be back here at 2pm
-        
+        setupDirectory()
+    }
+    
+    func setupDirectory() {
+        if !fileManager.fileExists(atPath: imageCacheDirectory.path) {
+            do {
+                try fileManager.createDirectory(at: imageCacheDirectory, withIntermediateDirectories: true)
+            } catch {
+                print("Error creating disk directory: \(error)")
+            }
+        }
     }
     
 //    func getObj(forKey key: NSString) async -> UIImage? {

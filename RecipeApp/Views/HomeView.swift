@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// TODO: Display message for empty recipe list
 struct HomeView: View {
     @StateObject var vm: HomeViewModel = HomeViewModel()
     
@@ -16,9 +17,9 @@ struct HomeView: View {
                 RecipeCardView(recipe: recipe)
             } //: List
             .padding()
-            .refreshable(action: vm.loadRecipes)
+            .refreshable(action: vm.initializeRecipes)
             .task {
-                await vm.loadRecipes()
+                await vm.initializeRecipes()
             }
             .overlay(
                 Label("Pull down to refresh", systemImage: "arrow.counterclockwise")
@@ -31,7 +32,7 @@ struct HomeView: View {
                 // TODO: Improve this later
                 ProgressView()
             }
-        }
+        } //: ZStack
     } //: Body
 }
 
