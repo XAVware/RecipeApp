@@ -17,19 +17,15 @@ import CryptoKit
 @MainActor
 class HomeViewModel: ObservableObject {
     private let networkService: NetworkService
-    private let memoryCacheService: NSCacheService
-    private let diskCacheService: DiskCacheService
+    private let imageLoader: AsyncImageLoader
     
     @Published var recipes: [Recipe] = []
     @Published var isLoading: Bool = false
     
-    init() {
+    init(networkService: NetworkService = NetworkService.shared,
+         imageLoader: AsyncImageLoader = AsyncImageLoader()) {
         self.networkService = NetworkService.shared
-        self.memoryCacheService = NSCacheService.shared
-        self.diskCacheService = DiskCacheService.shared
-        
-        diskCacheService.clearCache()
-        memoryCacheService.clearCache()
+        self.imageLoader = imageLoader
     }
     
     /// Initialize recipe array when app starts
@@ -48,74 +44,6 @@ class HomeViewModel: ObservableObject {
             print("Unknown error occured while loading recipes")
             return 
         }
-    }
-    
-    func getHash(of val: String) -> String {
-        return SHA256.hash(data: val.data(using: .utf8)!)
-            .compactMap { String(format: "%02x", $0) }
-            .joined()
-    }
-    
-    /*
-     1. Check memory because it is more coupled to the UI than disk cache
-     e.g. The cache should only contain images that have already appeared on screen whereas the disk cache could contain images from a previous session.
-     
-     2. Check disk
-     3. Download from web
-     */
-    @MainActor 
-    func loadImage(atPath path: String) async -> UIImage? {
-        let key = getHash(of: path)
-                 
-        // Check if image exists in cache, if not download then save to cache
-        if let memoryImage = await NSCacheService.shared.getObj(forKey: key) {
-            print(key, " found in memory")
-            return memoryImage
-        }
-
-        if let diskImage = await DiskCacheService.shared.getObj(forKey: key) {
-            print(key, "found on disk. Saving to memory")
-            await memoryCacheService.set(diskImage, forKey: key)
-            return diskImage
-        }
-        
-        if let networkImage = await downloadImage(atPath: path) {
-            await NSCacheService.shared.set(networkImage, forKey: key)
-            await DiskCacheService.shared.add(networkImage, forKey: key)
-            print("< NETWORK > ", key, " downloaded and saved to memory and disk")
-            return networkImage
-        }
-        
-        print("< ERROR > No image found")
-        return nil
-    } 
-    
-
-    /*
-     Called from RecipeCardView. The View only displays the image if it's not optional
-     This should be given a String and return an optional image
-     
-     Move caching logic somewhere else
-     */
-    /// Tries to convert the given URL string into a UIImage by fetching the URL's data from the network.
-    @MainActor 
-    func downloadImage(atPath urlString: String) async -> UIImage? {
-        do {
-            let imageData = try await networkService.getData(from: urlString)
-            let uiImage = try getImage(from: imageData)
-            return uiImage
-        } catch {
-            print("Error getting image: \(error)")
-            return nil
-        }
-    }
-    
-    
-    
-    /// Returns a UIImage from the given Data
-    private func getImage(from data: Data) throws -> UIImage {
-        guard let image = UIImage(data: data) else { throw AppError.invalidImageData }
-        return image
     }
 }
 

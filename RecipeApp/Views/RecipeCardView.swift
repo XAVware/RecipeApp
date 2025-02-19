@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct RecipeCardView: View {
-    @EnvironmentObject var vm: HomeViewModel
+    @EnvironmentObject var vm: AsyncImageLoader
     @State var recipe: Recipe
     
     @State var image: UIImage?

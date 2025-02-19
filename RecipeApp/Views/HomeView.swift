@@ -9,12 +9,20 @@ import SwiftUI
 
 // TODO: Display message for empty recipe list
 struct HomeView: View {
-    @StateObject var vm: HomeViewModel = HomeViewModel()
+    @StateObject var vm: HomeViewModel
+    @StateObject var imageLoader: AsyncImageLoader
     
+    init() {
+        let networkService = NetworkService.shared
+        let imageLoader = AsyncImageLoader(networkService: networkService)
+        self._imageLoader = StateObject(wrappedValue: imageLoader)
+        self._vm = StateObject(wrappedValue: HomeViewModel(networkService: networkService, imageLoader: imageLoader))
+    }
     var body: some View {
         ZStack {
             List(vm.recipes) { recipe in
                 RecipeCardView(recipe: recipe)
+                    .environmentObject(imageLoader)
             } //: List
             .padding()
             .refreshable(action: vm.initializeRecipes)
@@ -26,7 +34,6 @@ struct HomeView: View {
                     .font(.caption2)
                 , alignment: .top
             )
-            .environmentObject(vm)
             
             if vm.isLoading {
                 // TODO: Improve this later

@@ -19,7 +19,7 @@
 
  
  Views
- TODO: Display state of loading
+ [x] Display state of loading
  TODO: If the recipes list is empty, the app should display an empty state to inform users that no recipes are available.
  - This can probably be done in the View itself
  TODO: Make sure refresh is working with the cache 
@@ -36,9 +36,9 @@
  
  
  Cache
- TODO: Create CacheManaging protocol - exists, get, add
- TODO: Create DiskCacheService (FileManager)
- TODO: Create SessionCacheService (NSCache)
+ [x] Create CacheManaging protocol - exists, get, add
+ [x] Create DiskCacheService (FileManager)
+ [x] Create SessionCacheService (NSCache)
  
  
  Errors/Cases
@@ -48,13 +48,16 @@
 
  Tests
  TODO: Test JSON decoding
- TODO: Test CacheManaging protocol functions
+ [x] Test CacheManaging protocol functions
  TODO: Test proper AppError casting
  
  Before production
  TODO: Handle operating system versions back to iOS 16
- TODO: Make sure all image loading is using async/await
+ [x] Make sure all image loading is using async/await
 
+ 
+ Future:
+ TODO: Make cache services more generic, if this app were larger scale this could be reused, not specifically for images
  */
 
 

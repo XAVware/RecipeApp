@@ -14,7 +14,7 @@ import XCTest
 @testable import RecipeApp
 
 final class DiskCacheServiceTests: XCTestCase {
-    var testMemoryCacheService: NSCacheService!
+    var testMemoryCacheService: MemoryCacheService!
     var testDiskCacheService: DiskCacheService!
     private let fileManager = FileManager.default
     lazy var imageCacheDir: URL = {
@@ -25,10 +25,10 @@ final class DiskCacheServiceTests: XCTestCase {
     override func setUp() {
         super.setUp()
         testDiskCacheService = DiskCacheService.shared
-        testMemoryCacheService = NSCacheService.shared
+        testMemoryCacheService = MemoryCacheService.shared
         Task { 
-            await testDiskCacheService.clearCache()
-            await testMemoryCacheService.clearCache()
+            await testDiskCacheService.clear()
+            await testMemoryCacheService.clear()
         }
         
     }
@@ -36,8 +36,8 @@ final class DiskCacheServiceTests: XCTestCase {
     override func tearDown() {
         super.tearDown()
         Task { 
-            await testDiskCacheService.clearCache()
-            await testMemoryCacheService.clearCache()
+            await testDiskCacheService.clear()
+            await testMemoryCacheService.clear()
         }
     }
 
@@ -78,17 +78,17 @@ final class DiskCacheServiceTests: XCTestCase {
         let originalImage = UIImage(systemName: "dog")!
         
         Task {
-            let vm = await HomeViewModel()
+            let vm = await AsyncImageLoader()
             let key = await vm.getHash(of: urlPath)
             
             // Clear the caches and make sure the image doesn't exist in either
-            await testMemoryCacheService.clearCache()
-            await testDiskCacheService.clearCache()
+            await testMemoryCacheService.clear()
+            await testDiskCacheService.clear()
             
-            let nilMemoryImage = await testMemoryCacheService.getObj(forKey: key)
+            let nilMemoryImage = await testMemoryCacheService.get(forKey: key)
             XCTAssertNil(nilMemoryImage)
             
-            let nilDiskImage = await testDiskCacheService.getObj(forKey: key)
+            let nilDiskImage = await testDiskCacheService.get(forKey: key)
             XCTAssertNil(nilDiskImage)
             
             
@@ -99,10 +99,10 @@ final class DiskCacheServiceTests: XCTestCase {
             XCTAssertEqual(img, originalImage)
             
             // Check memory and disk to make sure they saved
-            let memoryImage = await testMemoryCacheService.getObj(forKey: key)
+            let memoryImage = await testMemoryCacheService.get(forKey: key)
             XCTAssertNotNil(memoryImage)
             
-            let diskImage = await testDiskCacheService.getObj(forKey: key)
+            let diskImage = await testDiskCacheService.get(forKey: key)
             XCTAssertNotNil(diskImage)
             
             XCTAssertEqual(memoryImage, originalImage)
@@ -111,7 +111,7 @@ final class DiskCacheServiceTests: XCTestCase {
             // The following lines should be isolated away from the network call. For the case of this project I'm going to run them as is and confirm the console does not log network activity.
             
             // Delete memory and make sure image pulls from disk
-            await testMemoryCacheService.clearCache()
+            await testMemoryCacheService.clear()
             
             let memoryImage2 = await vm.loadImage(atPath: urlPath)
             XCTAssertNotNil(memoryImage2)
