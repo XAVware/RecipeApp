@@ -12,14 +12,14 @@ struct RecipeCardView: View {
     @State var recipe: Recipe
     
     @State var image: UIImage?
-    
+    @State var isFavorite: Bool = false
     var body: some View {
-        VStack(alignment: .center) {
+        VStack(alignment: .leading, spacing: 6) {
             Group {
                 if let image = image {
                     Image(uiImage: image)
                         .resizable()
-                        .scaledToFit()
+                        .scaledToFill()
                 } else {
                     ProgressView()
                         .task {
@@ -28,16 +28,31 @@ struct RecipeCardView: View {
                         }
                 }
             } //: Group
-                .frame(width: 180)
-                .clipShape(RoundedRectangle(cornerRadius: 18))
+            .clipShape(RoundedRectangle(cornerRadius: 4))
             
-            HStack {
-                Text(recipe.cuisine)
-                Spacer()
+            VStack(alignment: .leading, spacing: 6) {
+                HStack {
+                    Text(recipe.cuisine)
+                        .font(.subheadline) 
+                    Spacer()
+                    Button("", systemImage: isFavorite ? "heart.fill" : "heart") { 
+                        withAnimation(.bouncy) {
+                            isFavorite.toggle()
+                        }
+                        // Cache through DiskCacheService in 'favorites' folder
+                    }
+                    .foregroundStyle(.pink)
+                    .labelStyle(.iconOnly)
+                }
                 Text(recipe.name)
-            } //: HStack
-            .padding()
+                    .font(.caption)
+                    .opacity(0.8)
+                    .frame(height: 36, alignment: .top)
+            } //: VStack
         } //: VStack
+        .frame(maxHeight: 360)
+        .frame(width: 120)
+        .padding(12)
     }
 }
 

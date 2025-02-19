@@ -10,6 +10,25 @@
  For this project I'm leaving all tests in this single file. Some are related to caching services, some are related to the view model. In a production project there would be multiple files encapsulating each different piece of the app.
  */
 
+/*
+ Sample response
+ 
+ {
+ "recipes": [
+ {
+ "cuisine": "British",
+ "name": "Bakewell Tart",
+ "photo_url_large": "https://some.url/large.jpg",           OPTIONAL
+ "photo_url_small": "https://some.url/small.jpg",           OPTIONAL
+ "uuid": "eed6005f-f8c8-451f-98d0-4088e2b40eb6",
+ "source_url": "https://some.url/index.html",               OPTIONAL
+ "youtube_url": "https://www.youtube.com/watch?v=some.id"   OPTIONAL
+ },
+ ...
+ ]
+ }
+ */
+
 import XCTest
 @testable import RecipeApp
 

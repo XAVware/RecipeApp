@@ -22,8 +22,8 @@
  [x] Display state of loading
  TODO: If the recipes list is empty, the app should display an empty state to inform users that no recipes are available.
  - This can probably be done in the View itself
- TODO: Make sure refresh is working with the cache 
- TODO: Load images only when needed in the UI to avoid unnecessary bandwidth consumption. Cache images to disk to minimize repeated network requests
+ [x] Make sure refresh is working with the cache 
+ [x] Load images only when needed in the UI to avoid unnecessary bandwidth consumption. Cache images to disk to minimize repeated network requests
      - Only mentions images, no need to cache JSON responses.
      - Load images as needed in the UI via NSCache because these are session based and will help UI performance; Cache images to disk so once the app closes/re opens the image can be fetched without relying on a network request
  
@@ -42,8 +42,8 @@
  
  
  Errors/Cases
- TODO: If a recipe is malformed, your app should disregard the entire list of recipes and handle the error gracefully.
- TODO: Error occuring while fetching small images
+ [x] If a recipe is malformed, your app should disregard the entire list of recipes and handle the error gracefully.
+ [x] Error occuring while fetching small images
 
 
  Tests
@@ -54,7 +54,7 @@
  Before production
  TODO: Handle operating system versions back to iOS 16
  [x] Make sure all image loading is using async/await
-
+ [x] Make the list look like Fetch Rewards
  
  Future:
  TODO: Make cache services more generic, if this app were larger scale this could be reused, not specifically for images

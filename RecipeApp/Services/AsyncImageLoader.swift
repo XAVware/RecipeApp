@@ -85,3 +85,14 @@ final class AsyncImageLoader: ObservableObject {
         return image
     }
 }
+
+// For checking the data returned from `networkService.getData(from: url)`
+extension AsyncImageLoader {
+    func printSize(of data: Data) {
+        var imageSizes: Int = 0
+        let imageData = NSData(data: data)
+        let imageSize: Int = imageData.count
+        imageSizes += imageSize
+        print(imageSizes)
+    }
+}

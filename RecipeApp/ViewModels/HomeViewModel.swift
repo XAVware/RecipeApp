@@ -22,6 +22,8 @@ class HomeViewModel: ObservableObject {
     @Published var recipes: [Recipe] = []
     @Published var isLoading: Bool = false
     
+    @Published var errorMessage: String = ""
+    
     init(networkService: NetworkService = NetworkService.shared,
          imageLoader: AsyncImageLoader = AsyncImageLoader()) {
         self.networkService = NetworkService.shared
@@ -29,7 +31,8 @@ class HomeViewModel: ObservableObject {
     }
     
     /// Initialize recipe array when app starts
-    func initializeRecipes() async {   
+    func fetchRecipes() async {   
+        self.errorMessage = ""
         self.isLoading = true
         defer { isLoading = false }
         
@@ -37,23 +40,25 @@ class HomeViewModel: ObservableObject {
             let recipes = try await networkService.fetchRecipes()
             self.recipes = recipes
         } catch let error as AppError {
-            // TODO: Handle malformed recipes.
-            print(error.localizedDescription)
+            // Edge case: Two errors have the same localized description
+            if error.localizedDescription == AppError.malformedResponse.localizedDescription {
+                displayError(message: "Unable to download recipes, please try again in a few seconds.")
+                recipes.removeAll()
+            }
             return
         } catch {
-            print("Unknown error occured while loading recipes")
+            displayError(message: "Unknown error occured while loading recipes")
             return 
+        }
+    }
+    
+    func displayError(message: String) {
+        errorMessage = message
+        Task(priority: .background) {
+            try? await Task.sleep(for: .seconds(4))
+            errorMessage = ""
         }
     }
 }
 
-// For checking the data returned from `networkService.getData(from: url)`
-extension HomeViewModel {
-    func printSize(of data: Data) {
-        var imageSizes: Int = 0
-        let imageData = NSData(data: data)
-        let imageSize: Int = imageData.count
-        imageSizes += imageSize
-        print(imageSizes)
-    }
-}
+
