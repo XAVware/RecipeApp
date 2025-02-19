@@ -1,0 +1,64 @@
+//
+//  DiskCacheService.swift
+//  RecipeApp
+//
+//  Created by Ryan Smetana on 2/18/25.
+//
+
+import SwiftUI
+
+@MainActor
+final class DiskCacheService {
+    static let shared: DiskCacheService = DiskCacheService()
+    
+    private let fileManager = FileManager.default
+    lazy var imageCacheDirectory: URL = {
+        let cacheDirectory = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first!
+        return cacheDirectory.appendingPathComponent("RecipeImages")
+    }()
+    
+    private init() {
+        setupDirectory()
+    }
+    
+    func setupDirectory() {
+        if !fileManager.fileExists(atPath: imageCacheDirectory.path) {
+            print("Creating cache directory")
+            do {
+                try fileManager.createDirectory(at: imageCacheDirectory, withIntermediateDirectories: true)
+            } catch {
+                print("Error creating disk directory: \(error)")
+            }
+        }
+    }
+    
+    func clearCache() {
+        do {
+            let cachedImagePaths = try fileManager.contentsOfDirectory(atPath: imageCacheDirectory.path)
+            cachedImagePaths.forEach({ deleteFile(atPath: $0) })
+        } catch {
+            print("Error clearing disk cache: \(error)")
+            return
+        }
+    }
+    
+    private func deleteFile(atPath path: String) {
+        try? fileManager.removeItem(atPath: path)
+    }
+    
+    func getObj(forKey key: String) async -> UIImage? {
+        let filePath = imageCacheDirectory.appendingPathComponent(key)
+        if let data = fileManager.contents(atPath: filePath.path) {
+            // This is going to return an optional image even if the image exists... okay?
+            let image = UIImage(data: data)
+            return image
+        }
+        return nil
+    }
+    
+    func add(_ image: UIImage, forKey key: String) async {
+        let imagePath = imageCacheDirectory.appendingPathComponent(key)
+        fileManager.createFile(atPath: imagePath.path, contents: image.jpegData(compressionQuality: 0))
+        print("Image cached to disk")
+    }
+}

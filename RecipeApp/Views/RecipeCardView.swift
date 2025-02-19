@@ -21,7 +21,11 @@ struct RecipeCardView: View {
                         .resizable()
                         .scaledToFit()
                 } else {
-                    // Show loading or placeholder for missing picture
+                    ProgressView()
+                        .task {
+                            guard let path = recipe.photoUrlSmall else { return }
+                            self.image = await vm.loadImage(atPath: path)
+                        }
                 }
             } //: Group
                 .frame(width: 180)
@@ -34,11 +38,6 @@ struct RecipeCardView: View {
             } //: HStack
             .padding()
         } //: VStack
-        .task {
-            // Ensure the recipe has a non-nil url before sending it to view model
-            guard let urlString = recipe.photoUrlSmall else { return }
-            self.image = await vm.downloadImage(at: urlString)
-        }
     }
 }
 

@@ -34,4 +34,14 @@ actor NetworkService {
         let data = try await URLSession.shared.data(from: url)
         return data.0
     }
+    
+    func getData(from urlStr: String) async throws -> Data {
+        let url = try getUrl(from: urlStr)
+        return try await getData(from: url)
+    }
+    
+    private func getUrl(from urlString: String) throws -> URL {
+        guard let url = URL(string: urlString) else { throw AppError.invalidUrlString }
+        return url
+    }
 }
