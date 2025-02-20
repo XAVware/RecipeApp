@@ -28,12 +28,20 @@ struct HomeView: View {
         ZStack {
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(alignment: .leading) {
-                    Text("Recipes")
-                        .font(.title)
-                        .fontWeight(.semibold)
-                        .fontDesign(.rounded)
-                        .padding(.horizontal)
                     
+                    if #available(iOS 16.1, *) { 
+                        Text("Recipes")
+                            .font(.title)
+                            .fontWeight(.semibold)
+                            .fontDesign(.rounded)
+                            .padding(.horizontal)
+                    } else {
+                        Text("Recipes")
+                            .font(.title)
+                            .fontWeight(.semibold)
+                            .padding(.horizontal)
+                    }
+                                                
                     recipeCardCarousel
                 } //: VStack
                 .padding(.vertical)
