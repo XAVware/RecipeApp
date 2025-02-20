@@ -4,8 +4,7 @@
 
 Screen recordings of the project can be found in the following Google Drive folder:
 
-<https://drive.google.com/drive/folders/1xTCFCwM9uK5GnkRcyOUkFPPZcrgwPhHE>
-
+<a target="_blank" rel="noopener noreferrer" href="https://drive.google.com/drive/folders/1xTCFCwM9uK5GnkRcyOUkFPPZcrgwPhHE">https://drive.google.com/drive/folders/1xTCFCwM9uK5GnkRcyOUkFPPZcrgwPhHE</a>
 
 ### Focus Areas: What specific areas of the project did you prioritize? Why did you choose to focus on these areas?
 
