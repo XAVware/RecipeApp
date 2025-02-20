@@ -30,7 +30,12 @@ class HomeViewModel: ObservableObject {
         self.imageLoader = imageLoader
     }
     
-    /// Initialize recipe array when app starts
+    /// Fetch recipes when the app launches
+    /// 
+    /// Load recipes from the web to display on the home page. Sets the `recipes` array to the retrieved data.
+    /// 
+    /// - Parameters: 
+    ///    - urlString: The string value of the url to fetch data from.
     func fetchRecipes(from urlString: String = "https://d3jbb8n5wk0qxi.cloudfront.net/recipes.json") async {   
         self.errorMessage = ""
         self.isLoading = true

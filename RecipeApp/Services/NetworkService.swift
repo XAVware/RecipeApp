@@ -27,6 +27,14 @@ actor NetworkService {
         }
     }
     
+    /// Decode data into a `Response` data model
+    /// 
+    /// Load recipes from the web to display on the home page. Sets the `recipes` array to the retrieved data.
+    /// 
+    /// - Parameters: 
+    ///    - data: The data to attempt to decode into a `Response`
+    /// - Returns: Valid `Response` object
+    /// - SeeAlso: `Response`
     func decodeResponseData(_ data: Data) throws -> Response {
         return try JSONDecoder().decode(Response.self, from: data)
     }
