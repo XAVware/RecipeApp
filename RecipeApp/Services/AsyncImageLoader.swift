@@ -23,6 +23,7 @@ final class AsyncImageLoader: ObservableObject {
     }
     
     func getHash(of val: String) -> String {
+        // TODO: Change from SHA256
         return SHA256.hash(data: val.data(using: .utf8)!)
             .compactMap { String(format: "%02x", $0) }
             .joined()
@@ -84,6 +85,8 @@ final class AsyncImageLoader: ObservableObject {
         guard let image = UIImage(data: data) else { throw AppError.invalidImageData }
         return image
     }
+    
+    
 }
 
 // For checking the data returned from `networkService.getData(from: url)`
