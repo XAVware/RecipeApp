@@ -50,7 +50,6 @@ struct RecipeCardView: View {
                     .frame(height: 36, alignment: .top)
             } //: VStack
         } //: VStack
-        .frame(maxHeight: 360)
         .frame(width: 120)
         .padding(12)
     }

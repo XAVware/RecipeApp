@@ -10,14 +10,12 @@ import Testing
 import Foundation
 import UIKit
 
-// Cache tests suite
-// Save to disk, memory, assert equal
-
 @Suite("Async Image Loader tests") final class AsyncImageLoaderTestSuite {
     var sut: AsyncImageLoader!
     
     init() async throws {
         sut = await AsyncImageLoader()
+        await sut.clearAllCaches()
     }
     
     @Test("Hash values match") func hashValuesMatch() async {
@@ -39,4 +37,23 @@ import UIKit
         
         #expect(hashOne != hashTwo)
     }
+    
+    @Test("Image successfully caches to disk") func testAddingImageToDisk() async {
+        let testImageName = "dog"
+        let img = UIImage(systemName: testImageName)
+        
+        await sut.addImageToDisk(img!, forKey: testImageName)
+        let newImage = await sut.getImageFromDisk(forKey: testImageName)
+        #expect(newImage != nil)
+    }
+    
+    @Test("Image successfully caches to memory") func testAddingImageToMemory() async {
+        let testImageName = "dog"
+        let img = UIImage(systemName: testImageName)
+        
+        await sut.addImageToMemory(img!, forKey: testImageName)
+        let newImage = await sut.getImageFromMemory(forKey: testImageName)
+        #expect(newImage != nil)
+    }
+    
 }

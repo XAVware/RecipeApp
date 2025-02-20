@@ -5,30 +5,6 @@
 //  Created by Ryan Smetana on 2/16/25.
 //
 
-/*
- 
- For this project I'm leaving all tests in this single file. Some are related to caching services, some are related to the view model. In a production project there would be multiple files encapsulating each different piece of the app.
- */
-
-/*
- Sample response
- 
- {
- "recipes": [
- {
- "cuisine": "British",
- "name": "Bakewell Tart",
- "photo_url_large": "https://some.url/large.jpg",           OPTIONAL
- "photo_url_small": "https://some.url/small.jpg",           OPTIONAL
- "uuid": "eed6005f-f8c8-451f-98d0-4088e2b40eb6",
- "source_url": "https://some.url/index.html",               OPTIONAL
- "youtube_url": "https://www.youtube.com/watch?v=some.id"   OPTIONAL
- },
- ...
- ]
- }
- */
-
 import XCTest
 @testable import RecipeApp
 
@@ -80,7 +56,6 @@ final class DiskCacheServiceTests: XCTestCase {
         let img = UIImage(systemName: key)
         let imagePath = imageCacheDir.appendingPathComponent(key)
         
-        
         Task {
             await testDiskCacheService.add(img!, forKey: key)
             let exists = fileManager.fileExists(atPath: imagePath.path)
@@ -91,7 +66,6 @@ final class DiskCacheServiceTests: XCTestCase {
     /*
      This test should really be broken into multiple tests, but for this project I'm leaving in one.
      */
-    
     func testDownloadingImageAndCacheToDiskAndMemory() {
         let urlPath = "https://d3jbb8n5wk0qxi.cloudfront.net/photos/b9ab0071-b281-4bee-b361-ec340d405320/large.jpg"
         let originalImage = UIImage(systemName: "dog")!

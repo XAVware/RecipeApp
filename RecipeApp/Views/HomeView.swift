@@ -34,19 +34,18 @@ struct HomeView: View {
                         .fontDesign(.rounded)
                         .padding(.horizontal)
                     
-                    ScrollView(.horizontal, showsIndicators: false) { 
-                        LazyHStack(spacing: 0) { 
-                            ForEach(vm.recipes) { recipe in 
-                                RecipeCardView(recipe: recipe)
-                                    .environmentObject(imageLoader)
-                            }
-                        } //: LazyHStack
-                    } //: ScrollView
+                    recipeCardCarousel
                 } //: VStack
                 .padding(.vertical)
             }
-            .refreshable(action: vm.fetchRecipes)
+            .refreshable {
+                Task {
+                    await vm.fetchRecipes()
+                }
+            }
             .task {
+//                await vm.fetchRecipes(from: "https://d3jbb8n5wk0qxi.cloudfront.net/recipes-empty.json") // Empty
+//                await vm.fetchRecipes(from: "https://d3jbb8n5wk0qxi.cloudfront.net/recipes-malformed.json") // Malformed
                 await vm.fetchRecipes()
             }
             .overlay(
@@ -57,7 +56,6 @@ struct HomeView: View {
             )
             
             if vm.isLoading {
-                // TODO: Improve this later
                 ProgressView()
             }
             
@@ -69,10 +67,36 @@ struct HomeView: View {
             .onReceive(vm.$errorMessage) { message in
                 message.isEmpty ? hideAlert() : showAlert()
             }
-            
-            
         } //: ZStack 
     } //: Body
+    
+    @ViewBuilder private var recipeCardCarousel: some View {
+        if !vm.recipes.isEmpty {
+            ScrollView(.horizontal, showsIndicators: false) { 
+                LazyHStack(spacing: 0) { 
+                    ForEach(vm.recipes) { recipe in 
+                        RecipeCardView(recipe: recipe)
+                            .environmentObject(imageLoader)
+                    }
+                } //: LazyHStack
+            } //: ScrollView
+        } else {
+            VStack {
+                Image(systemName: "arrow.counterclockwise")
+                    .resizable()
+                    .scaledToFit() 
+                    .frame(maxWidth: 56)
+                    .opacity(0.4)
+                    .padding()
+                
+                Text("No recipes found, please try again.")
+                    .frame(maxWidth: .infinity)
+               
+            }
+            .padding(.vertical)
+            
+        }
+    }
     
     @ViewBuilder private var alertView: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -96,6 +120,8 @@ struct HomeView: View {
         )
         .padding(.horizontal)
     }
+    
+    // MARK: - Functions
     
     func showAlert() {
         withAnimation(.easeIn(duration: 0.1)) { 

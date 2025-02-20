@@ -41,20 +41,20 @@ final class AsyncImageLoader: ObservableObject {
         let key = getHash(of: path)
         
         // Check if image exists in cache, if not download then save to cache
-        if let memoryImage = await MemoryCacheService.shared.get(forKey: key) {
+        if let memoryImage = await getImageFromMemory(forKey: key) {
             print(key, " found in memory")
             return memoryImage
         }
         
-        if let diskImage = await DiskCacheService.shared.get(forKey: key) {
+        if let diskImage = await getImageFromDisk(forKey: key) {
             print(key, "found on disk. Saving to memory")
             await memoryCacheService.add(diskImage, forKey: key)
             return diskImage
         }
         
         if let networkImage = await downloadImage(atPath: path) {
-            await MemoryCacheService.shared.add(networkImage, forKey: key)
-            await DiskCacheService.shared.add(networkImage, forKey: key)
+            await addImageToMemory(networkImage, forKey: key)
+            await addImageToDisk(networkImage, forKey: key)
             print("< NETWORK > ", key, " downloaded and saved to memory and disk")
             return networkImage
         }
@@ -62,6 +62,27 @@ final class AsyncImageLoader: ObservableObject {
         print("< ERROR > No image found")
         return nil
     } 
+    
+    func getImageFromMemory(forKey key: String) async -> UIImage? {
+        return await memoryCacheService.get(forKey: key)
+    }
+    
+    func getImageFromDisk(forKey key: String) async -> UIImage? {
+        return await diskCacheService.get(forKey: key)
+    }
+    
+    func addImageToMemory(_ img: UIImage, forKey key: String) async {
+        await memoryCacheService.add(img, forKey: key)
+    }
+    
+    func addImageToDisk(_ img: UIImage, forKey key: String) async {
+        await diskCacheService.add(img, forKey: key)
+    }
+    
+    func clearAllCaches() async {
+        memoryCacheService.clear()
+        diskCacheService.clear()
+    }
     
     /*
      Called from RecipeCardView. The View only displays the image if it's not optional

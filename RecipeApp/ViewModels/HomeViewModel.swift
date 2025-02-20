@@ -31,17 +31,17 @@ class HomeViewModel: ObservableObject {
     }
     
     /// Initialize recipe array when app starts
-    func fetchRecipes() async {   
+    func fetchRecipes(from urlString: String = "https://d3jbb8n5wk0qxi.cloudfront.net/recipes.json") async {   
         self.errorMessage = ""
         self.isLoading = true
         defer { isLoading = false }
         
         do {
-            let recipes = try await networkService.fetchRecipes()
+            let recipes = try await networkService.fetchRecipes(from: urlString)
             self.recipes = recipes
         } catch let error as AppError {
             // Edge case: Two errors have the same localized description
-            if error.localizedDescription == AppError.malformedResponse.localizedDescription {
+            if error == AppError.malformedResponse {
                 displayError(message: "Unable to download recipes, please try again in a few seconds.")
                 recipes.removeAll()
             }

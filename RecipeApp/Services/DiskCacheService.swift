@@ -13,8 +13,7 @@ final class DiskCacheService: CacheManaging {
     
     private let fileManager = FileManager.default
     lazy var imageCacheDirectory: URL = {
-        let cacheDirectory = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first!
-        return cacheDirectory.appendingPathComponent("RecipeImages")
+        fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first!
     }()
     
     private init() {
@@ -33,10 +32,6 @@ final class DiskCacheService: CacheManaging {
         }
     }
     
-    private func deleteFile(atPath path: String) {
-        try? fileManager.removeItem(atPath: path)
-    }
-
     func get(forKey key: String) async -> UIImage? {
         let filePath = imageCacheDirectory.appendingPathComponent(key)
         if let data = fileManager.contents(atPath: filePath.path) {
@@ -53,12 +48,16 @@ final class DiskCacheService: CacheManaging {
     
     func clear() {
         do {
-            let cachedImagePaths = try fileManager.contentsOfDirectory(atPath: imageCacheDirectory.path)
-            cachedImagePaths.forEach({ deleteFile(atPath: $0) })
-        } catch {
-            print("Error clearing disk cache: \(error)")
-            return
+            // Get the directory contents urls (including subfolders urls)
+            let cachedImagePaths = try FileManager.default.contentsOfDirectory( at: imageCacheDirectory, includingPropertiesForKeys: nil, options: [])
+            try cachedImagePaths.forEach({ try deleteFile(atPath: $0.path) })
+        } catch let error as NSError {
+            print(error.localizedDescription)
         }
+    }
+    
+    private func deleteFile(atPath path: String) throws {
+        try fileManager.removeItem(atPath: path)
     }
     
 }

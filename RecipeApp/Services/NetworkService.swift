@@ -10,24 +10,25 @@ import Foundation
 /// Handles all network activity for the app
 actor NetworkService {
 //    let recipeEndpointString: String = "https://d3jbb8n5wk0qxi.cloudfront.net/recipes-malformed.json" // Malformed
-
-    let recipeEndpointString: String = "https://d3jbb8n5wk0qxi.cloudfront.net/recipes.json"
-    
     static let shared: NetworkService = NetworkService()
     
     private init() { }
     
-    func fetchRecipes() async throws -> [Recipe] {
-        guard let url = URL(string: self.recipeEndpointString) else { throw AppError.invalidUrlString }
+    func fetchRecipes(from urlString: String = "https://d3jbb8n5wk0qxi.cloudfront.net/recipes.json") async throws -> [Recipe] {
+        guard let url = URL(string: urlString) else { throw AppError.invalidUrlString }
         do {
             let data = try await getData(from: url)            
-            let response = try JSONDecoder().decode(Response.self, from: data)
+            let response = try decodeResponseData(data)
             return response.recipes
         } catch _ as DecodingError {
             throw AppError.malformedResponse
         } catch {
             throw AppError.fetchRecipeError(error)
         }
+    }
+    
+    func decodeResponseData(_ data: Data) throws -> Response {
+        return try JSONDecoder().decode(Response.self, from: data)
     }
     
     func getData(from url: URL) async throws -> Data {

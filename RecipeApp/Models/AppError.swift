@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum AppError: Error {    
+enum AppError: Error, Equatable {    
     case invalidImageData
     case invalidImage
     case invalidUrlString
@@ -22,6 +22,10 @@ enum AppError: Error {
         case .fetchRecipeError(let err): "A non coding key error was thrown while fetching recipes: \(err)"
         case .malformedResponse: "Malformed response data"
         }
+    }
+    
+    static func == (lhs: AppError, rhs: AppError) -> Bool {
+        return lhs.localizedDescription == rhs.localizedDescription
     }
 }
 
